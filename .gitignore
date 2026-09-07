@@ -1,0 +1,8 @@
+/bin/
+/.egm/
+/docs/
+.DS_Store
+*.o
+*.tmp
+/catalog.json
+/generate.json
