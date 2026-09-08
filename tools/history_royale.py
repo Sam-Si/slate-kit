@@ -43,7 +43,10 @@ def play(a: tuple[str, Path], b: tuple[str, Path]) -> dict:
     out = OUT_DIR / f"{a[0]}_vs_{b[0]}.json"
     if out.is_file():
         j = json.loads(out.read_text())
-        return {
+        if j.get("games") != 10:
+            out.unlink()
+        else:
+            return {
             "a": a[0],
             "b": b[0],
             "rc": 0,
