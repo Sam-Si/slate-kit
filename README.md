@@ -59,7 +59,7 @@ They are not a CI pin.
 | `submission/history/` | Last 20 live contest submits, descriptively named |
 | `referee/` | Fidelity `Game` headers + `process_duel` |
 | `RULES.md` | Fidelity law from those headers, plus how Magus/`fast` differ |
-| `battles/fenrir/` | **237** last-battles JSON for Fenrir agent `6500255` (this snapshot) |
+| `battles/fenrir/` | **929** Fenrir JSON (every public replay we could find: live last-battles window + older submits + opponent-window harvest). `IDS.txt` lists the ids. |
 | `battles/top5/` | **48** JSON: 12 recent games each for Agade, reCurse, YurkovAS, pb4 (disjoint; Fenrir is under `fenrir/`) |
 | `battles/our_recent/` | **85** JSON from the last 32 days: **83** include SamSi; **2** are fenrir vs Agade |
 | `battles/LAST_MONTH_IDS.txt` | **6513** numeric battle ids (file also has 2 comment lines) from 2026-08-05 to 2026-09-06. Ids only. |
@@ -75,8 +75,8 @@ not Fidelity. This file is the contest paste. The sha256 is the identity;
 do not hand-edit.
 
 The paste header also mentions a **43-replay** Fenrir emit study. That is
-a subset used when writing the emit rules. The **237** files under
-`battles/fenrir/` are the later last-battles window, not that 43-game set.
+a subset used when writing the emit rules. `battles/fenrir/` is every
+Fenrir replay we could still reach, not that 43-game set.
 
 Measured on 2026-09-06 on one Mac (clang, `-mcpu=native`):
 
@@ -148,10 +148,12 @@ Shipped `.json` files are **responses** from
 (keys include `frames`, `gameId`, `agents`, `ranks`). They are not the
 request array.
 
-Fenrir’s last-battles **list** is
+Fenrir’s live last-battles **list** is
 `POST /services/gamesPlayersRanking/findLastBattlesByAgentId` with
-`[6500255, null]`. That list does not paginate. Older Fenrir submits live
-under other agent ids and are **not** all copied here.
+`[6500255, null]` (~233 games). That list does not paginate. Older Fenrir
+submits (`6434652`, `6423325`, …) list 0 on that API; those bodies are
+here only because they were still on disk or still sat in an opponent’s
+window. All 929 files are `findByGameId` `[id, null]` responses.
 
 JSON bodies live under `battles/fenrir/`, `battles/top5/`, and
 `battles/our_recent/`. `LAST_MONTH_IDS.txt` is the id list only.
