@@ -104,16 +104,14 @@ for name in $CORE_NAMES; do
   compile_named "$name"
 done
 
-if [[ "$HOST_LINUX_AARCH64" -eq 1 ]]; then
-  for name in $AVX_NAMES; do
-    echo "setup: SKIP $name on Linux aarch64"
-  done
-else
-  echo "setup: compile AVX GA pastes"
-  for name in $AVX_NAMES; do
-    compile_named "$name"
-  done
-fi
+echo "setup: compile remaining contest pastes"
+for name in $AVX_NAMES; do
+  if skip_named "$name"; then
+    echo "setup: SKIP $name on this host"
+    continue
+  fi
+  compile_named "$name"
+done
 
 echo "setup: binaries in $ROOT/bin"
 ls -l "$ROOT/bin"

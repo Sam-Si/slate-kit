@@ -107,7 +107,7 @@ After any teammate scores a CP, the team timeout is set to `100 + 1` and then de
 | Layer | Where | Role |
 |---|---|---|
 | **Fidelity** `csb::Game` | `referee/physics/` | Referee / `process_duel` / battle replay oracle |
-| **Magus `play()`** | inside `bots/current/searchbot.cpp` | What the SearchBot **simulates while searching** |
+| **Magus `play()`** | inside `submission/searchbot.cpp` | What the SearchBot **simulates while searching** |
 | **`csb::fast::SimulateTurn`** | `referee/physics/fast.h` | Degrees collision fragment used by older GA pastes — **not** the Fidelity oracle |
 
 Do not treat Magus `play()` or `csb::fast` as the CG keyframe oracle. The oracle is Fidelity.

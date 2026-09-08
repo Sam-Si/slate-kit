@@ -26,12 +26,12 @@ file_sha() {
 }
 SHA_SB=131bccec663f92583b2f68e80b692728e2de8086cc3fd2ac1317564ea6cbeb8c
 SHA_FZ=a18a3505d3c98e49c8119d4be2a4ff3727df32b5b6ccab2e4fcba66c597e6d01
-got_sb="$(file_sha bots/current/searchbot.cpp)"
-got_fz="$(file_sha bots/opponents/searchbot_frozen_magus.cpp)"
+got_sb="$(file_sha submission/searchbot.cpp)"
+got_fz="$(file_sha submission/frozen_magus.cpp)"
 [[ "$got_sb" == "$SHA_SB" ]] || fail "searchbot sha $got_sb"
 [[ "$got_fz" == "$SHA_FZ" ]] || fail "frozen sha $got_fz"
 grep -q "$SHA_SB" README.md || fail "searchbot sha missing from README.md"
-grep -q "$SHA_FZ" bots/README.md || fail "frozen sha missing from bots/README.md"
+grep -q "$SHA_FZ" submission/README.md || fail "frozen sha missing from submission/README.md"
 ok "paste sha256"
 
 # --- counts + every battle JSON ---
@@ -71,24 +71,18 @@ for name in $CORE_NAMES; do
   compile_named "$name"
   [[ -x "bin/$name" ]] || fail "missing bin/$name"
 done
-if [[ "$HOST_LINUX_AARCH64" -eq 1 ]]; then
-  for name in $AVX_NAMES; do
-    echo "verify: SKIP compile $name on Linux aarch64"
-  done
-else
-  for name in $AVX_NAMES; do
-    compile_named "$name"
-    [[ -x "bin/$name" ]] || fail "missing bin/$name"
-  done
-fi
+for name in $AVX_NAMES; do
+  if skip_named "$name"; then
+    echo "verify: SKIP compile $name on this host"
+    continue
+  fi
+  compile_named "$name"
+  [[ -x "bin/$name" ]] || fail "missing bin/$name"
+done
 ok "binaries"
 
 # --- protocol-smoke agents (never process_duel) ---
-if [[ "$HOST_LINUX_AARCH64" -eq 1 ]]; then
-  VERIFY_AGENTS="searchbot frozen_b legacy_amalgam"
-else
-  VERIFY_AGENTS="$AGENT_NAMES"
-fi
+VERIFY_AGENTS="$(compiled_agent_names)"
 export VERIFY_AGENTS
 python3 - <<'PY'
 import os, select, signal, subprocess, sys, time

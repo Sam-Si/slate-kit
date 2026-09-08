@@ -52,9 +52,10 @@ They are not a CI pin.
 
 | Path | Why it is here |
 |---|---|
-| `bots/current/searchbot.cpp` | Current best paste (Fenrir-emit Magus SearchBot) |
-| `bots/ga/` | Named historical GA pastes (source only) |
-| `bots/opponents/searchbot_frozen_magus.cpp` | Unread Magus B used for generate grids |
+| `submission/searchbot.cpp` | Current best contest paste |
+| `submission/inoryy.cpp` | inoryy opponent contest paste |
+| `submission/frozen_magus.cpp` | Unread Magus B used for generate grids |
+| `submission/ga/` | Named historical GA contest pastes |
 | `referee/` | Fidelity `Game` headers + `process_duel` |
 | `RULES.md` | Fidelity law from those headers, plus how Magus/`fast` differ |
 | `battles/fenrir/` | **237** last-battles JSON for Fenrir agent `6500255` (this snapshot) |
@@ -64,7 +65,7 @@ They are not a CI pin.
 
 ## Current best bot
 
-`bots/current/searchbot.cpp`  
+`submission/searchbot.cpp`  
 sha256 `131bccec663f92583b2f68e80b692728e2de8086cc3fd2ac1317564ea6cbeb8c`
 
 It is Magus SearchBot (`DEPTH=6`, `POP=48`) with Fenrir **emit** rules. It
@@ -82,7 +83,7 @@ Measured on 2026-09-06 on one Mac (clang, `-mcpu=native`):
 - Catalog **18 maps × 2 sides × 1** vs Ultimate H=4: **36–0**
 - Same 36-game catalog grid vs nine named GAs: **304–20, wr=0.938** (no draws on that run)
 
-See `bots/README.md` for the per-opponent table. Those 36-game figures are
+See `submission/README.md` for the per-opponent table. Those 36-game figures are
 one repeat, not a 15-repeat 540-game grid.
 
 ## Physics
@@ -164,10 +165,11 @@ JSON bodies live under `battles/fenrir/`, `battles/top5/`, and
 ## Layout
 
 ```
-bots/current/searchbot.cpp
-bots/ga/*.cpp
-bots/opponents/searchbot_frozen_magus.cpp
-bots/README.md
+submission/searchbot.cpp
+submission/inoryy.cpp
+submission/frozen_magus.cpp
+submission/ga/*.cpp
+submission/README.md
 referee/{process_duel.cpp,agade_maps.h,core/,physics/}
 battles/{fenrir,top5,our_recent,LAST_MONTH_IDS.txt}
 setup.sh
