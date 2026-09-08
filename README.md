@@ -56,6 +56,7 @@ They are not a CI pin.
 | `submission/inoryy.cpp` | inoryy opponent contest paste |
 | `submission/frozen_magus.cpp` | Unread Magus B used for generate grids |
 | `submission/ga/` | Named historical GA contest pastes |
+| `submission/history/` | Last 20 live contest submits, descriptively named |
 | `referee/` | Fidelity `Game` headers + `process_duel` |
 | `RULES.md` | Fidelity law from those headers, plus how Magus/`fast` differ |
 | `battles/fenrir/` | **237** last-battles JSON for Fenrir agent `6500255` (this snapshot) |
