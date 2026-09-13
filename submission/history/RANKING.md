@@ -1,9 +1,11 @@
 # History battle royale
 
 Last 20 contest pastes (newest first in `INDEX.json`).
+This table is the royale **before** `41275613` (current `01`). Re-run
+`python3 tools/history_royale.py` to include ChampionBot horizon 7.
 C++ field: 17 unique binaries. Duplicate `40873000` omitted (byte-identical to `40873174`).
-Python pastes `40911934` and `40777737` are stored in this folder but were not Fidelity fighters:
-`40911934` is a numpy policy net; `40777737` JIT-compiles embedded C with `-mavx2` and does not load on Apple Silicon.
+Python paste `40911934` is stored here but was not a Fidelity fighter
+(numpy policy net).
 
 ## Method
 
@@ -18,30 +20,30 @@ Python pastes `40911934` and `40777737` are stored in this folder but were not F
 
 | Rank | Submission | W-L-D | Games | Winrate | Sweeps | Swept |
 |---:|---|---:|---:|---:|---:|---:|
-| 1 | `17_id40809909_cxx_arena_ultimate_ga_horizon6_pop80_mcts1ms.cpp` | 116-43-1 | 160 | 0.725 | 4 | 0 |
-| 2 | `01_id41243437_cxx_fenrir_emit_searchbot_depth6_pop48_photofinish.cpp` | 115-45-0 | 160 | 0.719 | 4 | 0 |
-| 3 | `03_id41200404_cxx_magus_searchbot_depth6_pop48.cpp` | 112-45-3 | 160 | 0.700 | 4 | 0 |
-| 4 | `02_id41242156_cxx_magus_searchbot_depth6_pop48_photofinish.cpp` | 110-50-0 | 160 | 0.688 | 4 | 0 |
-| 5 | `06_id40873174_cxx_f16_mlp_81action_policy_238828b.cpp` | 101-58-1 | 160 | 0.631 | 3 | 0 |
-| 6 | `08_id40865682_cxx_f16_mlp_81action_policy_235623b.cpp` | 99-60-1 | 160 | 0.619 | 1 | 0 |
-| 7 | `13_id40815807_cxx_oppnn_stub_ultimate_ga_horizon6_pop80_turnbudget74500us.cpp` | 99-61-0 | 160 | 0.619 | 4 | 0 |
-| 8 | `04_id41048080_cxx_oppnn_ultimate_ga_horizon6_pop80.cpp` | 98-60-2 | 160 | 0.613 | 4 | 0 |
-| 9 | `18_id40809110_cxx_arena_ultimate_ga_horizon6_pop80.cpp` | 91-67-2 | 160 | 0.569 | 4 | 0 |
-| 10 | `16_id40813840_cxx_oppnn_w85_weights_ultimate_ga_horizon6_pop80.cpp` | 91-69-0 | 160 | 0.569 | 4 | 0 |
-| 11 | `15_id40815752_cxx_oppnn_stub_ultimate_ga_horizon6_pop80_turnbudget75000us.cpp` | 86-74-0 | 160 | 0.537 | 4 | 0 |
-| 12 | `19_id40805459_cxx_arena_ultimate_ga_horizon6_pop80.cpp` | 83-77-0 | 160 | 0.519 | 1 | 0 |
-| 13 | `14_id40815760_cxx_oppnn_stub_ultimate_ga_horizon6_pop80_turnbudget74000us.cpp` | 82-78-0 | 160 | 0.512 | 4 | 0 |
-| 14 | `12_id40837727_cxx_ppo_checkpoint_iter49600.cpp` | 23-137-0 | 160 | 0.144 | 0 | 11 |
-| 15 | `11_id40855409_cxx_tinf_compressed_weight_policy_94686b.cpp` | 22-138-0 | 160 | 0.138 | 1 | 11 |
-| 16 | `10_id40856590_cxx_tinf_compressed_weight_policy_94188b.cpp` | 20-140-0 | 160 | 0.125 | 0 | 11 |
-| 17 | `09_id40857141_cxx_tinf_compressed_weight_policy_92515b.cpp` | 7-153-0 | 160 | 0.044 | 0 | 13 |
+| 1 | `18_id40809909_cxx_arena_ultimate_ga_horizon6_pop80_mcts1ms.cpp` | 116-43-1 | 160 | 0.725 | 4 | 0 |
+| 2 | `02_id41243437_cxx_fenrir_emit_searchbot_depth6_pop48_photofinish.cpp` | 115-45-0 | 160 | 0.719 | 4 | 0 |
+| 3 | `04_id41200404_cxx_magus_searchbot_depth6_pop48.cpp` | 112-45-3 | 160 | 0.700 | 4 | 0 |
+| 4 | `03_id41242156_cxx_magus_searchbot_depth6_pop48_photofinish.cpp` | 110-50-0 | 160 | 0.688 | 4 | 0 |
+| 5 | `07_id40873174_cxx_f16_mlp_81action_policy_238828b.cpp` | 101-58-1 | 160 | 0.631 | 3 | 0 |
+| 6 | `09_id40865682_cxx_f16_mlp_81action_policy_235623b.cpp` | 99-60-1 | 160 | 0.619 | 1 | 0 |
+| 7 | `14_id40815807_cxx_oppnn_stub_ultimate_ga_horizon6_pop80_turnbudget74500us.cpp` | 99-61-0 | 160 | 0.619 | 4 | 0 |
+| 8 | `05_id41048080_cxx_oppnn_ultimate_ga_horizon6_pop80.cpp` | 98-60-2 | 160 | 0.613 | 4 | 0 |
+| 9 | `19_id40809110_cxx_arena_ultimate_ga_horizon6_pop80.cpp` | 91-67-2 | 160 | 0.569 | 4 | 0 |
+| 10 | `17_id40813840_cxx_oppnn_w85_weights_ultimate_ga_horizon6_pop80.cpp` | 91-69-0 | 160 | 0.569 | 4 | 0 |
+| 11 | `16_id40815752_cxx_oppnn_stub_ultimate_ga_horizon6_pop80_turnbudget75000us.cpp` | 86-74-0 | 160 | 0.537 | 4 | 0 |
+| 12 | `20_id40805459_cxx_arena_ultimate_ga_horizon6_pop80.cpp` | 83-77-0 | 160 | 0.519 | 1 | 0 |
+| 13 | `15_id40815760_cxx_oppnn_stub_ultimate_ga_horizon6_pop80_turnbudget74000us.cpp` | 82-78-0 | 160 | 0.512 | 4 | 0 |
+| 14 | `13_id40837727_cxx_ppo_checkpoint_iter49600.cpp` | 23-137-0 | 160 | 0.144 | 0 | 11 |
+| 15 | `12_id40855409_cxx_tinf_compressed_weight_policy_94686b.cpp` | 22-138-0 | 160 | 0.138 | 1 | 11 |
+| 16 | `11_id40856590_cxx_tinf_compressed_weight_policy_94188b.cpp` | 20-140-0 | 160 | 0.125 | 0 | 11 |
+| 17 | `10_id40857141_cxx_tinf_compressed_weight_policy_92515b.cpp` | 7-153-0 | 160 | 0.044 | 0 | 13 |
 
 ## Not in the C++ field
 
 | File | Why |
 |---|---|
-| `05_id40911934_python3_numpy_policy_net_iter60800.py` | Python paste; not a compiled Fidelity fighter |
-| `07_id40873000_cxx_f16_mlp_81action_policy_duplicate_of_40873174.cpp` | byte-identical duplicate of `40873174` |
+| `06_id40911934_python3_numpy_policy_net_iter60800.py` | Python paste; not a compiled Fidelity fighter |
+| `08_id40873000_cxx_f16_mlp_81action_policy_duplicate_of_40873174.cpp` | byte-identical duplicate of `40873174` |
 | `20_id40777737_python3_embedded_c_ga_horizon6_pop80.py` | Python paste; not a compiled Fidelity fighter |
 
 ## Pair results
