@@ -23,5 +23,12 @@ not this `01` paste.
 Python pastes live here but are not Fidelity fighters: `40911934` is a numpy
 policy net.
 
+One command vs every unique C++ history paste (compiles missing
+binaries, catalog maps 0–17 × both sides × 100, need wr ≥ 0.90):
+
+```bash
+./tools/vs_history.sh newbot.cpp
+```
+
 Ranking: `RANKING.md` after `python3 tools/history_royale.py`. That table
 predates `41275613`.

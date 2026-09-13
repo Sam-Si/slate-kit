@@ -49,6 +49,13 @@ the catalog vs `ultimate_h4` smoke are SKIP, and `CXX` is pinned to
 default. `process_duel` is POSIX. Scores below are **one wall-clock run**
 (TIME-based search). They are not a CI pin.
 
+Challenger vs last-20 C++ history (compile if needed, all catalog maps,
+both sides, 100 repeats, wr ≥ 0.90):
+
+```bash
+./tools/vs_history.sh newbot.cpp
+```
+
 ## What is in here
 
 | Path | Why it is here |
