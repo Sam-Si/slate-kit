@@ -1,21 +1,19 @@
 #!/usr/bin/env bash
-# Install compile deps on Ubuntu/Debian and build every binary this repo ships.
-# macOS uses the clang++ already on PATH.
+# Install compile deps, build every binary this host can, then verify.
 # Usage:
-#   ./setup.sh           install if needed, compile, one-game referee smoke
-#   ./setup.sh --no-apt  compile + smoke (no apt)
-#   ./setup.sh --verify  compile, then run tools/verify.sh (no extra smoke)
+#   ./setup.sh           apt if needed, compile, tools/verify.sh
+#   ./setup.sh --no-apt  compile + verify (no apt)
+#   ./setup.sh --verify  same as default (kept for old docs)
 # Apt uses apt-get as root; sudo only when not root.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 # shellcheck source=tools/host.sh
 source "$ROOT/tools/host.sh"
 DO_APT=1
-DO_VERIFY=0
 for a in "$@"; do
   case "$a" in
     --no-apt) DO_APT=0 ;;
-    --verify) DO_VERIFY=1 ;;
+    --verify) ;;
     -h|--help)
       sed -n '2,7p' "$0"
       exit 0
@@ -101,10 +99,10 @@ if [[ "$is_debian" -eq 1 ]]; then
 fi
 
 if [[ "$have_clang" -eq 0 && "$have_gxx" -eq 0 ]]; then
-  echo "setup: need clang++ or g++. On Ubuntu: sudo apt-get install -y clang" >&2
+  echo "setup: need clang++ or g++. On Ubuntu: apt-get install -y clang" >&2
   exit 1
 fi
-if [[ "$DO_VERIFY" -eq 1 && "$have_py" -eq 0 ]]; then
+if [[ "$have_py" -eq 0 ]]; then
   echo "setup: need python3 for tools/verify.sh" >&2
   exit 1
 fi
@@ -127,43 +125,5 @@ done
 echo "setup: binaries in $ROOT/bin"
 ls -l "$ROOT/bin"
 
-if [[ "$DO_VERIFY" -eq 1 ]]; then
-  exec "$ROOT/tools/verify.sh"
-fi
-
-# Fast proof the referee can play two different compiled bots (one generated map).
-echo "setup: one-game referee smoke (searchbot vs frozen_b)"
-SMOKE_OUT="$ROOT/bin/smoke_generate.json"
-"$ROOT/bin/process_duel" \
-  --bot-a "$ROOT/bin/searchbot" \
-  --bot-b "$ROOT/bin/frozen_b" \
-  --gen-maps 1 --gen-seed 42 --sides 0 --repeats 1 \
-  --first-turn-ms 1000 --time-budget-ms 75 \
-  --out "$SMOKE_OUT"
-if command -v python3 >/dev/null 2>&1; then
-  python3 - "$SMOKE_OUT" <<'PY'
-import json, sys
-from pathlib import Path
-j = json.loads(Path(sys.argv[1]).read_text())
-recs = j.get("games_detail") or []
-if j.get("games") != 1 or len(recs) != 1:
-    print("setup: smoke bad shape", file=sys.stderr)
-    sys.exit(1)
-rec = recs[0]
-if rec.get("reason") != "finished" or int(rec.get("turns") or 0) < 20:
-    print(
-        f"setup: smoke failed reason={rec.get('reason')} turns={rec.get('turns')}",
-        file=sys.stderr,
-    )
-    sys.exit(1)
-print(f"setup: smoke ok reason=finished turns={rec['turns']}")
-PY
-else
-  grep -q '"reason":"finished"' "$SMOKE_OUT" || {
-    echo "setup: smoke missing reason=finished" >&2
-    exit 1
-  }
-  echo "setup: smoke ok (no python3 to check turns)"
-fi
-
-echo "setup: done. Full check: ./tools/verify.sh"
+echo "setup: verify"
+exec "$ROOT/tools/verify.sh"

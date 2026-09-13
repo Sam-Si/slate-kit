@@ -261,6 +261,9 @@ for rel in out.splitlines():
         continue
     if rel.startswith("docs/egm/"):
         continue
+    # Live contest dumps; they mention arena paths in comments.
+    if rel.startswith("submission/history/"):
+        continue
     files.append(rel)
 
 hits = []

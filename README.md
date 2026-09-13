@@ -36,18 +36,17 @@ and truncated; positions round-half-up. Pods collide at center distance
 On Ubuntu or Debian:
 
 ```bash
-./setup.sh --verify
+./setup.sh
 ```
 
-That installs `clang` if `clang++` is missing and `python3` if it is
-missing (`apt-get` as root; `sudo apt-get` only when not root), compiles
-the referee and the pastes this host can build, then runs `tools/verify.sh`.
-Bare `./setup.sh` (no `--verify`) also plays **one** generated-map Fidelity
-smoke (`searchbot` vs `frozen_b`, seed 42). Every host except Linux aarch64
-plays two one-game Fidelity smokes under `--verify`. On Linux aarch64 the
-eight AVX GA pastes and the catalog vs `ultimate_h4` smoke are SKIP, and
-`CXX` is pinned to `clang++`. `--no-apt` skips the package step.
-`process_duel` is POSIX. Scores below are **one wall-clock run**
+That is the whole check. It installs `clang` / `python3` if missing
+(`apt-get` as root; `sudo` only when not root), compiles the referee and
+the pastes this host can build, then runs `tools/verify.sh` (paste
+sha256, battle JSON counts, protocol smoke, RULES vs constants, two
+one-game Fidelity smokes). On Linux aarch64 the eight AVX GA pastes and
+the catalog vs `ultimate_h4` smoke are SKIP, and `CXX` is pinned to
+`clang++`. `--no-apt` skips the package step. `--verify` is the same as
+default. `process_duel` is POSIX. Scores below are **one wall-clock run**
 (TIME-based search). They are not a CI pin.
 
 ## What is in here
