@@ -6,6 +6,7 @@
 #include "agade_maps.h"
 
 #include <algorithm>
+#include <atomic>
 #include <chrono>
 #include <cerrno>
 #include <cmath>
@@ -15,10 +16,12 @@
 #include <cstdlib>
 #include <cstring>
 #include <fcntl.h>
+#include <mutex>
 #include <poll.h>
 #include <spawn.h>
 #include <string>
 #include <sys/wait.h>
+#include <thread>
 #include <unistd.h>
 #include <vector>
 
@@ -243,6 +246,7 @@ struct Cli {
     int gen_maps = 0;
     uint32_t gen_seed = 1;
     std::vector<int> gen_instances;
+    int jobs = 0;
 };
 
 static std::vector<int> parse_list(const char* s, int lo, int hi) {
@@ -303,6 +307,8 @@ static Cli parse_cli(int argc, char** argv) {
             c.gen_seed = static_cast<uint32_t>(std::strtoul(need(), nullptr, 10));
         else if (a == "--gen-instances")
             c.gen_instances = parse_list(need(), 0, 10000);
+        else if (a == "--jobs")
+            c.jobs = std::atoi(need());
         else
             die("unknown flag");
     }
@@ -318,6 +324,14 @@ static Cli parse_cli(int argc, char** argv) {
     }
     if (c.repeats < 1) c.repeats = 1;
     return c;
+}
+
+static void sort_recs(std::vector<GameRec>* v) {
+    std::sort(v->begin(), v->end(), [](const GameRec& a, const GameRec& b) {
+        if (a.map != b.map) return a.map < b.map;
+        if (a.side != b.side) return a.side < b.side;
+        return a.repeat < b.repeat;
+    });
 }
 
 static bool already_done(const Agg& a, int map, int side, int rep) {
@@ -535,6 +549,10 @@ static GameRec play_one(const Cli& cli, int map, int side,
 
 int main(int argc, char** argv) {
     signal(SIGPIPE, SIG_IGN);
+    // Bots think on one core. The referee fans games out across cores.
+    setenv("OMP_NUM_THREADS", "1", 1);
+    setenv("OPENBLAS_NUM_THREADS", "1", 1);
+    setenv("MKL_NUM_THREADS", "1", 1);
     Cli cli = parse_cli(argc, argv);
     Agg agg;
     if (cli.out) load_resume(cli.out, &agg);
@@ -557,30 +575,72 @@ int main(int argc, char** argv) {
         }
     }
 
+    struct Job {
+        int map;
+        int side;
+        int rep;
+        size_t track_i;
+    };
+    std::vector<Job> jobs;
     for (size_t mi = 0; mi < cli.maps.size(); mi++) {
         const int map = cli.maps[mi];
-        const auto& cps = tracks[mi];
         for (int side : cli.sides) {
             for (int rep = 0; rep < cli.repeats; rep++) {
                 if (already_done(agg, map, side, rep)) continue;
-                GameRec g = play_one(cli, map, side, cps);
-                g.repeat = rep;
-                agg.recs.push_back(g);
-                agg.games++;
-                if (g.mapped_winner == 0)
-                    agg.wins_a++;
-                else if (g.mapped_winner == 1)
-                    agg.wins_b++;
-                else
-                    agg.draws++;
-                std::fprintf(stderr, "game map=%d side=%d rep=%d winner=%d mapped=%d turns=%d %s wr=%.3f\n",
-                             g.map, g.side, g.repeat, g.winner, g.mapped_winner, g.turns,
-                             g.reason.c_str(),
-                             agg.games ? (double)agg.wins_a / agg.games : 0.0);
-                if (cli.out) write_json(cli, agg, cli.out);
+                jobs.push_back({map, side, rep, mi});
             }
         }
     }
+
+    unsigned cores = std::thread::hardware_concurrency();
+    int nworkers = cli.jobs;
+    if (nworkers <= 0) nworkers = cores ? static_cast<int>(cores) : 1;
+    if (nworkers < 1) nworkers = 1;
+    if (!jobs.empty() && nworkers > static_cast<int>(jobs.size()))
+        nworkers = static_cast<int>(jobs.size());
+
+    std::fprintf(stderr, "process_duel: cores=%u jobs=%d remaining=%zu\n", cores,
+                 nworkers, jobs.size());
+
+    std::mutex mu;
+    std::atomic<size_t> next{0};
+    auto worker = [&]() {
+        while (true) {
+            size_t i = next.fetch_add(1);
+            if (i >= jobs.size()) break;
+            const Job& job = jobs[i];
+            GameRec g = play_one(cli, job.map, job.side, tracks[job.track_i]);
+            g.repeat = job.rep;
+            std::lock_guard<std::mutex> lock(mu);
+            agg.recs.push_back(g);
+            agg.games++;
+            if (g.mapped_winner == 0)
+                agg.wins_a++;
+            else if (g.mapped_winner == 1)
+                agg.wins_b++;
+            else
+                agg.draws++;
+            std::fprintf(stderr,
+                         "game map=%d side=%d rep=%d winner=%d mapped=%d turns=%d %s wr=%.3f\n",
+                         g.map, g.side, g.repeat, g.winner, g.mapped_winner, g.turns,
+                         g.reason.c_str(),
+                         agg.games ? (double)agg.wins_a / agg.games : 0.0);
+            if (cli.out) {
+                sort_recs(&agg.recs);
+                write_json(cli, agg, cli.out);
+            }
+        }
+    };
+
+    if (nworkers <= 1) {
+        worker();
+    } else {
+        std::vector<std::thread> pool;
+        pool.reserve(static_cast<size_t>(nworkers));
+        for (int w = 0; w < nworkers; w++) pool.emplace_back(worker);
+        for (auto& t : pool) t.join();
+    }
+    sort_recs(&agg.recs);
     if (!cli.out) {
         double wr = agg.games ? (double)agg.wins_a / (double)agg.games : 0.0;
         const auto& m0 = GetTournamentMapsRaw()[0];

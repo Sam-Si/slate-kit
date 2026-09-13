@@ -27,7 +27,7 @@ pin_host_cxx() {
 CORE_NAMES="process_duel searchbot frozen_b legacy_amalgam"
 
 # Unguarded #pragma GCC target("avx2,..."). SKIP compile on Linux aarch64.
-AVX_NAMES="ultimate_h4 ultimate_opt recommended previous_submission st_h8_p64 self_baseline_h4_p48 parallel8_deep h6_p48 inoryy"
+AVX_NAMES="ultimate_h4 ultimate_opt recommended previous_submission st_h8_p64 self_baseline_h4_p48 h6_p48 inoryy"
 
 # Contest-protocol agents (never process_duel).
 AGENT_NAMES="searchbot frozen_b legacy_amalgam $AVX_NAMES"

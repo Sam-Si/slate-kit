@@ -36,7 +36,6 @@ inoryy ChampionBot contest paste (GA horizon 6, pop 80). Uses AVX2/`immintrin.h`
 | `previous_submission.cpp` | Prior user GA paste | 0.944 (34–2) |
 | `st_h8_p64.cpp` | H=8 P=64 | 0.944 (34–2) |
 | `self_baseline_h4_p48.cpp` | Self baseline H=4 P=48 | 0.917 (33–3) |
-| `parallel8_deep.cpp` | Multi-core research paste | 0.917 (33–3) |
 | `h6_p48.cpp` | H=6 P=48 | 0.833 (30–6) |
 | `legacy_amalgam.cpp` | Older in-repo GA + `fast` | 1.000 (36–0) |
 

@@ -31,12 +31,13 @@ else
   _native="-march=native"
 fi
 
-# -pthread: parallel8_deep.cpp. Harmless on the other pastes.
 # -Wno-unknown-pragmas: Apple clang ignores #pragma GCC target.
-_common="-std=c++17 -DNDEBUG -Wno-unknown-pragmas -pthread"
+# Referee links -pthread for the game thread pool. Bots stay single-core
+# (no -fopenmp). -pthread remains on bots only so legacy_amalgam links.
+_common="-std=c++17 -DNDEBUG -Wno-unknown-pragmas"
 if "$CXX" --version 2>/dev/null | head -n 1 | grep -qi clang; then
   _common="${_common} -Wno-pragma-once-outside-header"
 fi
-CXX_REF_FLAGS="-O2 ${_common}"
-CXX_BOT_FLAGS="-O3 -fno-math-errno -fomit-frame-pointer ${_native} ${_common}"
+CXX_REF_FLAGS="-O2 ${_common} -pthread"
+CXX_BOT_FLAGS="-O3 -fno-math-errno -fomit-frame-pointer ${_native} ${_common} -pthread"
 unset _uname _native _common

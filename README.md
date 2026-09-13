@@ -43,7 +43,7 @@ That is the whole check. It installs `clang` / `python3` if missing
 (`apt-get` as root; `sudo` only when not root), compiles the referee and
 the pastes this host can build, then runs `tools/verify.sh` (paste
 sha256, battle JSON counts, protocol smoke, RULES vs constants, two
-one-game Fidelity smokes). On Linux aarch64 the eight AVX GA pastes and
+one-game Fidelity smokes). On Linux aarch64 the AVX GA pastes and
 the catalog vs `ultimate_h4` smoke are SKIP, and `CXX` is pinned to
 `clang++`. `--no-apt` skips the package step. `--verify` is the same as
 default. `process_duel` is POSIX. Scores below are **one wall-clock run**
@@ -129,12 +129,13 @@ contest 1000/75 budget. SearchBot self-limits to 0.94 / 0.074 s.
   --out generate.json
 ```
 
-Eight of the nine GA pastes (all except `legacy_amalgam.cpp`) carry an
-unguarded `#pragma GCC target("avx2,fma,bmi,bmi2")`. That is fine on
-x86_64 clang/g++. Apple clang ignores it (`-Wno-unknown-pragmas`).
-aarch64 Linux clang/g++ may reject those eight pastes. The current
-SearchBot paste and frozen Magus B wrap that pragma in
-`#if !defined(__clang__)`.
+The AVX GA pastes (all named `ga/` files except `legacy_amalgam.cpp`)
+carry an unguarded `#pragma GCC target("avx2,fma,bmi,bmi2")`. That is
+fine on x86_64 clang/g++. Apple clang ignores it (`-Wno-unknown-pragmas`).
+aarch64 Linux clang/g++ may reject those pastes. The current SearchBot
+paste and frozen Magus B wrap that pragma in `#if !defined(__clang__)`.
+`process_duel` runs independent games on every hardware thread (`--jobs`
+overrides). Each bot process is one core (`OMP_NUM_THREADS=1`).
 
 `fast::SimulateTurn` is shipped because `physics.h` includes `fast.h`.
 It is a **degrees collision fragment** for older GA search, not the
