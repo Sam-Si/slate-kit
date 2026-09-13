@@ -2,9 +2,10 @@
 # Install compile deps on Ubuntu/Debian and build every binary this repo ships.
 # macOS uses the clang++ already on PATH.
 # Usage:
-#   ./setup.sh           install if needed, then compile
-#   ./setup.sh --no-apt  compile only
-#   ./setup.sh --verify  compile, then run tools/verify.sh
+#   ./setup.sh           install if needed, compile, one-game referee smoke
+#   ./setup.sh --no-apt  compile + smoke (no apt)
+#   ./setup.sh --verify  compile, then run tools/verify.sh (no extra smoke)
+# Apt uses apt-get as root; sudo only when not root.
 set -euo pipefail
 ROOT="$(cd "$(dirname "$0")" && pwd)"
 # shellcheck source=tools/host.sh
@@ -60,7 +61,7 @@ if [[ "$is_debian" -eq 1 ]]; then
   if [[ -n "$pkgs" ]]; then
     if [[ "$DO_APT" -ne 1 ]]; then
       echo "setup: missing $pkgs. Install with:" >&2
-      echo "  sudo apt-get update && sudo apt-get install -y $pkgs" >&2
+      echo "  apt-get update && apt-get install -y $pkgs" >&2
       exit 1
     fi
     if ! command -v apt-get >/dev/null 2>&1; then
@@ -68,10 +69,20 @@ if [[ "$is_debian" -eq 1 ]]; then
       exit 1
     fi
     echo "setup: apt-get install $pkgs"
-    sudo apt-get update
+    # Root containers have no sudo. Only use sudo when we are not root.
     # $pkgs is a space-separated name list built above.
     # shellcheck disable=SC2086
-    sudo apt-get install -y $pkgs
+    if [[ "$(id -u)" -eq 0 ]]; then
+      apt-get update
+      apt-get install -y $pkgs
+    elif command -v sudo >/dev/null 2>&1; then
+      sudo apt-get update
+      sudo apt-get install -y $pkgs
+    else
+      echo "setup: need root or sudo to install $pkgs" >&2
+      echo "  apt-get update && apt-get install -y $pkgs" >&2
+      exit 1
+    fi
     have_clang=0
     if command -v clang++ >/dev/null 2>&1; then
       have_clang=1
@@ -119,4 +130,40 @@ ls -l "$ROOT/bin"
 if [[ "$DO_VERIFY" -eq 1 ]]; then
   exec "$ROOT/tools/verify.sh"
 fi
-echo "setup: done. Optional smoke: ./tools/verify.sh"
+
+# Fast proof the referee can play two different compiled bots (one generated map).
+echo "setup: one-game referee smoke (searchbot vs frozen_b)"
+SMOKE_OUT="$ROOT/bin/smoke_generate.json"
+"$ROOT/bin/process_duel" \
+  --bot-a "$ROOT/bin/searchbot" \
+  --bot-b "$ROOT/bin/frozen_b" \
+  --gen-maps 1 --gen-seed 42 --sides 0 --repeats 1 \
+  --first-turn-ms 1000 --time-budget-ms 75 \
+  --out "$SMOKE_OUT"
+if command -v python3 >/dev/null 2>&1; then
+  python3 - "$SMOKE_OUT" <<'PY'
+import json, sys
+from pathlib import Path
+j = json.loads(Path(sys.argv[1]).read_text())
+recs = j.get("games_detail") or []
+if j.get("games") != 1 or len(recs) != 1:
+    print("setup: smoke bad shape", file=sys.stderr)
+    sys.exit(1)
+rec = recs[0]
+if rec.get("reason") != "finished" or int(rec.get("turns") or 0) < 20:
+    print(
+        f"setup: smoke failed reason={rec.get('reason')} turns={rec.get('turns')}",
+        file=sys.stderr,
+    )
+    sys.exit(1)
+print(f"setup: smoke ok reason=finished turns={rec['turns']}")
+PY
+else
+  grep -q '"reason":"finished"' "$SMOKE_OUT" || {
+    echo "setup: smoke missing reason=finished" >&2
+    exit 1
+  }
+  echo "setup: smoke ok (no python3 to check turns)"
+fi
+
+echo "setup: done. Full check: ./tools/verify.sh"

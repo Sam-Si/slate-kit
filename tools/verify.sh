@@ -38,7 +38,7 @@ ok "paste sha256"
 python3 - <<'PY'
 import json, pathlib, sys
 root = pathlib.Path(".")
-want = {"battles/fenrir": 237, "battles/top5": 48, "battles/our_recent": 85}
+want = {"battles/fenrir": 929, "battles/top5": 48, "battles/our_recent": 85}
 need = ("frames", "gameId", "agents", "ranks")
 for rel, n in want.items():
     files = sorted((root / rel).glob("battle_*.json"))
